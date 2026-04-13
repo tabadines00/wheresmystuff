@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equipment Ops Panel</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <h1>Gear Ops</h1>
+        <nav>
+            <button class="nav-btn active" data-tab="users">1. Users</button>
+            <button class="nav-btn" data-tab="equipment">2. Equipment</button>
+            <button class="nav-btn" data-tab="kits">3. Kits</button>
+            <button class="nav-btn" data-tab="loans">4. Loans (Checkout / Return)</button>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Users Tab -->
+        <section id="usersTab" class="tab-content active">
+            <div class="panel">
+                <h2>Create User</h2>
+                <form id="userForm">
+                    <input type="text" id="userName" placeholder="Name" required>
+                    <select id="userRole">
+                        <option value="member">Member</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                    <button type="submit">Create User</button>
+                </form>
+            </div>
+            <div class="panel">
+                <h2>All Users</h2>
+                <table id="usersTable">
+                    <thead><tr><th>Name</th><th>Role</th><th>ID</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Equipment Tab -->
+        <section id="equipmentTab" class="tab-content">
+            <div class="panel">
+                <h2>Register Equipment</h2>
+                <form id="equipmentForm">
+                    <input type="text" id="equipName" placeholder="Gear Name" required>
+                    <select id="equipOwner" required><option value="">Select Owner...</option></select>
+                    <button type="submit">Register</button>
+                </form>
+            </div>
+            <div class="panel">
+                <h2>Equipment List</h2>
+                <div class="filters">
+                    <label><input type="radio" name="eqFilter" value="all" checked> All</label>
+                    <label><input type="radio" name="eqFilter" value="available"> Available</label>
+                    <label><input type="radio" name="eqFilter" value="checked_out"> Checked Out</label>
+                </div>
+                <table id="equipmentTable">
+                    <thead><tr><th>Name</th><th>Status</th><th>Owner</th><th>Kit ID</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Kits Tab -->
+        <section id="kitsTab" class="tab-content">
+            <div class="panel">
+                <h2>Create Kit</h2>
+                <form id="kitForm">
+                    <input type="text" id="kitName" placeholder="Kit Name" required>
+                    <select id="kitOwner" required><option value="">Select Owner...</option></select>
+                    <button type="submit">Create Kit</button>
+                </form>
+            </div>
+            <div class="panel">
+                <h2>Add Equipment to Kit</h2>
+                <form id="kitItemsForm">
+                    <select id="kitSelect" required><option value="">Select Kit...</option></select>
+                    <p class="hint">Hold Shift or Cmd/Ctrl to select multiple</p>
+                    <select id="kitEquipSelect" multiple required size="5" class="multi-select"></select>
+                    <button type="submit">Add to Kit</button>
+                </form>
+            </div>
+            <div class="panel">
+                <h2>All Kits</h2>
+                <div id="kitsList"></div>
+            </div>
+        </section>
+
+        <!-- Loans Tab -->
+        <section id="loansTab" class="tab-content">
+            <div class="panel split-panel">
+                <div class="half">
+                    <h2>New Loan (Checkout)</h2>
+                    <form id="loanForm">
+                        <select id="loanBorrower" required><option value="">Select Borrower...</option></select>
+                        <select id="loanLender" required><option value="">Select Lender (Authorizer)...</option></select>
+                        
+                        <div class="combo-select">
+                            <label>Quick Select by Kit:</label>
+                            <select id="loanKitSelect"><option value="">-- Choose Kit to Auto-Select --</option></select>
+                        </div>
+
+                        <label>Select Available Equipment (Hold Shift/Cmd to multi-select):</label>
+                        <select id="loanEquipSelect" multiple required size="10" class="multi-select"></select>
+                        
+                        <button type="submit" class="btn-primary">Submit Loan</button>
+                    </form>
+                </div>
+                <div class="half">
+                    <h2>Active Loans</h2>
+                    <div id="activeLoansList"></div>
+                    
+                    <h2 style="margin-top:2rem;">Returned Loans</h2>
+                    <div id="returnedLoansList"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="toastContainer"></div>
+    <script src="app.js"></script>
+</body>
+</html>
