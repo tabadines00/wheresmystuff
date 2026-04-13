@@ -10,12 +10,13 @@
 <body>
     <header>
         <h1>Gear Ops</h1>
-        <nav>
-            <button class="nav-btn active" data-tab="users">1. Users</button>
-            <button class="nav-btn" data-tab="equipment">2. Equipment</button>
-            <button class="nav-btn" data-tab="kits">3. Kits</button>
-            <button class="nav-btn" data-tab="loans">4. Loans (Checkout / Return)</button>
-        </nav>
+            <nav>
+                <button class="nav-btn active" data-tab="users">1. Users</button>
+                <button class="nav-btn" data-tab="equipment">2. Equipment</button>
+                <button class="nav-btn" data-tab="kits">3. Kits</button>
+                <button class="nav-btn" data-tab="loans">4. Loans (Checkout / Return)</button>
+                <button class="nav-btn" data-tab="pullSheets">5. Pull Sheets (Personal)</button>
+            </nav>
     </header>
 
     <main>
@@ -116,6 +117,29 @@
                     
                     <h2 style="margin-top:2rem;">Returned Loans</h2>
                     <div id="returnedLoansList"></div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Pull Sheets Tab -->
+        <section id="pullSheetsTab" class="tab-content">
+            <div class="panel">
+                <h2>Select User to View Pull Sheet</h2>
+                <select id="pullSheetUserSelect">
+                    <option value="">-- Select Person --</option>
+                </select>
+            </div>
+            
+            <div class="panel split-panel">
+                <div class="half">
+                    <h2>📦 Items I am Borrowing</h2>
+                    <p class="hint" style="margin-bottom: 1rem;">Gear you currently have in your possession that belongs to others.</p>
+                    <div id="borrowedItemsList"></div>
+                </div>
+                <div class="half">
+                    <h2>🚀 My Gear "In the Wild"</h2>
+                    <p class="hint" style="margin-bottom: 1rem;">Your equipment currently checked out by others.</p>
+                    <div id="loanedItemsList"></div>
                 </div>
             </div>
         </section>

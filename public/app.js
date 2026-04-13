@@ -38,6 +38,11 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     });
+
+    // Pull Sheet Selection
+    document.getElementById('pullSheetUserSelect').addEventListener('change', () => {
+        renderPullSheet();
+    });
 });
 
 function initTabs() {
@@ -122,6 +127,7 @@ function renderAll() {
     renderEquipment();
     renderKits();
     renderLoans();
+    renderPullSheet();
     populateSelects();
 }
 
@@ -199,6 +205,51 @@ function renderLoans() {
     `).join('');
 }
 
+async function renderPullSheet() {
+    const userId = document.getElementById('pullSheetUserSelect').value;
+    const borrowedList = document.getElementById('borrowedItemsList');
+    const loanedList = document.getElementById('loanedItemsList');
+
+    if (!userId) {
+        borrowedList.innerHTML = '<p class="hint">Select a user above to see their borrowed items.</p>';
+        loanedList.innerHTML = '<p class="hint">Select a user above to see gear they own that is loaned out.</p>';
+        return;
+    }
+
+    const [borrowedData, loanedData] = await Promise.all([
+        apiCall('GET', `/loans?status=active&borrower_id=${userId}`),
+        apiCall('GET', `/loans?status=active&equipment_owner_id=${userId}`)
+    ]);
+
+    // Items I am Borrowing
+    if (borrowedData && borrowedData.results) {
+        const loans = borrowedData.results;
+        borrowedList.innerHTML = loans.length === 0 ? '<p class="hint">You are not currently borrowing any items.</p>' : loans.map(l => `
+            <div class="loan-card border-warning">
+                <div class="loan-meta">Borrowed From: <strong>${l.lender_name}</strong></div>
+                <div class="loan-meta">Date: ${new Date(l.created_at).toLocaleDateString()}</div>
+                <ul class="items-list">
+                    ${l.items.map(i => `<li>${i.equipment_name}</li>`).join('')}
+                </ul>
+            </div>
+        `).join('');
+    }
+
+    // My Gear In the Wild
+    if (loanedData && loanedData.results) {
+        const loans = loanedData.results;
+        loanedList.innerHTML = loans.length === 0 ? '<p class="hint">No gear you own is currently loaned out.</p>' : loans.map(l => `
+            <div class="loan-card border-warning">
+                <div class="loan-meta">Current Holder: <strong>${l.borrower_name}</strong></div>
+                <div class="loan-meta">Loan Date: ${new Date(l.created_at).toLocaleDateString()}</div>
+                <ul class="items-list">
+                    ${l.items.map(i => `<li>${i.equipment_name}</li>`).join('')}
+                </ul>
+            </div>
+        `).join('');
+    }
+}
+
 function populateSelects() {
     // Users
     const userOpts = users.map(u => `<option value="${u.id}">${u.name} (${u.role})</option>`).join('');
@@ -206,6 +257,7 @@ function populateSelects() {
     document.getElementById('kitOwner').innerHTML = '<option value="">Select Owner...</option>' + userOpts;
     document.getElementById('loanBorrower').innerHTML = '<option value="">Select Borrower...</option>' + userOpts;
     document.getElementById('loanLender').innerHTML = '<option value="">Select Lender (Authorizer)...</option>' + userOpts;
+    document.getElementById('pullSheetUserSelect').innerHTML = '<option value="">-- Select Person --</option>' + userOpts;
 
     // Kits
     const kitOpts = kits.map(k => `<option value="${k.id}">${k.name}</option>`).join('');

@@ -107,7 +107,7 @@ export class LoanService {
     return { success: true };
   }
 
-  async listLoans(status?: 'active' | 'returned') {
+  async listLoans(filters: { status?: 'active' | 'returned', borrower_id?: string, equipment_owner_id?: string } = {}) {
     let query = `
       SELECT 
         l.*, 
@@ -118,10 +118,25 @@ export class LoanService {
       JOIN users lend ON l.lender_id = lend.id
     `;
     const params: string[] = [];
+    const conditions: string[] = [];
+
+    if (filters.status) {
+      conditions.push('l.status = ?');
+      params.push(filters.status);
+    }
     
-    if (status) {
-      query += ' WHERE l.status = ?';
-      params.push(status);
+    if (filters.borrower_id) {
+      conditions.push('l.borrower_id = ?');
+      params.push(filters.borrower_id);
+    }
+
+    if (filters.equipment_owner_id) {
+      conditions.push('EXISTS (SELECT 1 FROM loan_items li JOIN equipment e ON li.equipment_id = e.id WHERE li.loan_id = l.id AND e.owner_id = ?)');
+      params.push(filters.equipment_owner_id);
+    }
+
+    if (conditions.length > 0) {
+      query += ' WHERE ' + conditions.join(' AND ');
     }
     
     query += ' ORDER BY l.created_at DESC';
@@ -132,12 +147,22 @@ export class LoanService {
     if (loanIds.length === 0) return { results: [] };
 
     const placeholders = loanIds.map(() => '?').join(',');
-    const items = await this.db.prepare(`
-      SELECT li.loan_id, e.name as equipment_name, e.id as equipment_id
+    
+    let itemsQuery = `
+      SELECT li.loan_id, e.name as equipment_name, e.id as equipment_id, e.owner_id
       FROM loan_items li
       JOIN equipment e ON li.equipment_id = e.id
       WHERE li.loan_id IN (${placeholders})
-    `).bind(...loanIds).all<any>();
+    `;
+    
+    const itemsParams = [...loanIds];
+    
+    if (filters.equipment_owner_id) {
+      itemsQuery += ' AND e.owner_id = ?';
+      itemsParams.push(filters.equipment_owner_id);
+    }
+
+    const items = await this.db.prepare(itemsQuery).bind(...itemsParams).all<any>();
 
     const results = loans.results.map((loan: any) => ({
       ...loan,
