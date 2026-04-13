@@ -1,9 +1,6 @@
-let API_BASE = 'https://wheresmystuff.thomas-abadines.workers.dev';
-
-// If we are developing locally, point to the local wrangler dev server
-if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-    API_BASE = 'http://localhost:8787';
-}
+// Since the frontend is now served by the same Worker as our API (via Workers Assets), 
+// we can use relative paths entirely. This naturally works for both local dev AND prod!
+const API_BASE = '';
 
 
 let users = [];
