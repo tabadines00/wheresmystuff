@@ -106,4 +106,44 @@ export class LoanService {
 
     return { success: true };
   }
+
+  async listLoans(status?: 'active' | 'returned') {
+    let query = `
+      SELECT 
+        l.*, 
+        b.name as borrower_name, 
+        lend.name as lender_name 
+      FROM loans l
+      JOIN users b ON l.borrower_id = b.id
+      JOIN users lend ON l.lender_id = lend.id
+    `;
+    const params: string[] = [];
+    
+    if (status) {
+      query += ' WHERE l.status = ?';
+      params.push(status);
+    }
+    
+    query += ' ORDER BY l.created_at DESC';
+
+    const loans = await this.db.prepare(query).bind(...params).all<any>();
+    
+    const loanIds = loans.results.map((l: any) => l.id);
+    if (loanIds.length === 0) return { results: [] };
+
+    const placeholders = loanIds.map(() => '?').join(',');
+    const items = await this.db.prepare(`
+      SELECT li.loan_id, e.name as equipment_name, e.id as equipment_id
+      FROM loan_items li
+      JOIN equipment e ON li.equipment_id = e.id
+      WHERE li.loan_id IN (${placeholders})
+    `).bind(...loanIds).all<any>();
+
+    const results = loans.results.map((loan: any) => ({
+      ...loan,
+      items: items.results.filter((i: any) => i.loan_id === loan.id)
+    }));
+
+    return { results };
+  }
 }

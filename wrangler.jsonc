@@ -9,7 +9,10 @@
 			"database_name": "film-equipment",
 			"database_id": "4a5f7ca7-c2fc-4f8a-ba43-2b24ab552563"
 		}
-	]
+	],
+	"assets": {
+		"directory": "./public"
+	}
 	// "compatibility_flags": [
 	//   "nodejs_compat"
 	// ],

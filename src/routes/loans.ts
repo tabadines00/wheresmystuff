@@ -3,6 +3,17 @@ import { LoanService } from '../services/loanService';
 
 const loans = new Hono<{ Bindings: { DB: D1Database } }>();
 
+loans.get('/', async (c) => {
+  const status = c.req.query('status') as 'active' | 'returned' | undefined;
+  const service = new LoanService(c.env.DB);
+  try {
+    const result = await service.listLoans(status);
+    return c.json(result);
+  } catch (err: any) {
+    return c.json({ error: err.message }, 500);
+  }
+});
+
 loans.post('/', async (c) => {
   const { borrower_id, lender_id, equipment_ids } = await c.req.json<{
     borrower_id: string;
