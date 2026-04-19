@@ -15,7 +15,7 @@ describe('System API Integration', () => {
   beforeAll(async () => {
     const cleanSchema = schema
       .split('\n')
-      .filter((line) => {
+      .filter((line: string) => {
         const trimmed = line.trim();
         return trimmed && !trimmed.startsWith('PRAGMA') && !trimmed.startsWith('--');
       })
@@ -47,7 +47,7 @@ describe('System API Integration', () => {
     // 3. Kits
     const kit = await kitService.createKit('Basic Kit', admin.id);
     await kitService.addItemsToKit(kit.id, [cam.id, lens.id]);
-    
+
     const kitDetails = await kitService.getKit(kit.id);
     expect(kitDetails?.items.length).toBe(2);
     expect(kitDetails?.name).toBe('Basic Kit');
@@ -63,10 +63,10 @@ describe('System API Integration', () => {
   it('should filter equipment by status', async () => {
     const admin = await userService.createUser('Status Admin', 'admin');
     const eq = await equipmentService.createEquipment('Status Gear', admin.id);
-    
+
     const available = await equipmentService.listEquipment('available');
     expect(available.results.some(item => item.id === eq.id)).toBe(true);
-    
+
     const checkedOut = await equipmentService.listEquipment('checked_out');
     expect(checkedOut.results.some(item => item.id === eq.id)).toBe(false);
   });
