@@ -6,6 +6,8 @@ const audit = new Hono<{ Bindings: { DB: D1Database } }>();
 audit.get('/', async (c) => {
   const limit = parseInt(c.req.query('limit') || '50');
   const offset = parseInt(c.req.query('offset') || '0');
+
+  // Hello from beaverton library
   
   const service = new AuditService(c.env.DB);
   const result = await service.listLogs(limit, offset);

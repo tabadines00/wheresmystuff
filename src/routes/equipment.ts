@@ -9,6 +9,8 @@ equipment.post('/', async (c) => {
   const service = new EquipmentService(c.env.DB);
   const result = await service.createEquipment(name, owner_id);
   return c.json(result, 201);
+
+  // Hello again
 });
 
 equipment.get('/', async (c) => {
