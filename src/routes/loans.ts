@@ -5,10 +5,14 @@ const loans = new Hono<{ Bindings: { DB: D1Database } }>();
 
 loans.get('/', async (c) => {
   const status = c.req.query('status') as 'active' | 'returned' | undefined;
+  const borrower_id = c.req.query('borrower_id');
+  const equipment_owner_id = c.req.query('equipment_owner_id');
+
   const service = new LoanService(c.env.DB);
   try {
-    const result = await service.listLoans(status);
+    const result = await service.listLoans({ status, borrower_id, equipment_owner_id });
     return c.json(result);
+
   } catch (err: any) {
     return c.json({ error: err.message }, 500);
   }
